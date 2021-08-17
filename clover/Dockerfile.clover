@@ -1,0 +1,31 @@
+FROM deivac/ascent
+SHELL ["/bin/bash","--rcfile", "/etc/profile", "-l", "-c"]
+
+RUN useradd -ms "/bin/bash --rcfile /etc/profile -l -c" docker
+RUN mkdir /home/docker/clover; chmod -R 777 /home/docker
+
+COPY inputs/ /home/docker/clover/inputs/
+WORKDIR /home/docker/clover/
+
+# copy the run files to a convenient location
+RUN SPACK_HASH_PATH=`spack location --install-dir ascent`; echo $SPACK_HASH_PATH; \
+    cp -rf $SPACK_HASH_PATH/examples/ascent/proxies/cloverleaf3d/* .; \
+    cp /home/docker/clover/inputs/ascent/ascent_actions.yaml .; \
+    rm -f ascent_actions.json;
+
+# run the app
+RUN mpiexec --allow-run-as-root -n 2 ./cloverleaf3d_par || true
+
+# installing cinema viewer
+RUN mkdir -p cinema_databases; cp -rf /home/docker/clover/inputs/cinema/* .;
+
+
+RUN apt-get update && apt-get upgrade -y && apt-get -y install nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+RUN chmod -R 777 /home/docker/clover/cinema_databases
+#COPY entrypoint.sh /home/docker/clover
+EXPOSE 80
+ENTRYPOINT ["nginx","-g","daemon off;"]
+#ENTRYPOINT ["/home/docker/clover/entrypoint.sh"]
+
+#ENTRYPOINT ["/bin/bash", "--rcfile", "/etc/profile", "-l"]

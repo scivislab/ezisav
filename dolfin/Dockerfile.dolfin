@@ -1,0 +1,41 @@
+# Build stage with Spack pre-installed and ready to be used
+FROM deivac/base as builder
+
+
+# What we want to install and how we want to install it
+# is specified in a manifest file (spack.yaml)
+RUN (echo "spack:" \
+&&   echo "  specs:" \
+&&   echo "  - fenics+vtk~hdf5" \
+&&   echo "  - cmake" \
+&&   echo "  - flex@2.6.4" \
+&&   echo "  - openmpi@4.1.1+legacylaunchers+pmi+singularity+thread_multiple fabrics=ucx schedulers=slurm" \
+&&   echo "  view: false" \
+&&   echo "  concretization: together" \
+&&   echo "  config:" \
+&&   echo "    install_tree: /opt/software") > /opt/spack-environment/spack.yaml
+
+# Install the software, remove unnecessary deps
+RUN  cd /opt/spack-environment && spack env activate . && export SPACKMON_USER=$(cat /run/secrets/su) && export SPACKMON_TOKEN=$(cat /run/secrets/st) && spack install --fail-fast && spack gc -y
+
+# Modifications to the environment that are necessary to run
+RUN cd /opt/spack-environment && \
+    spack env activate --sh -d . >> /etc/profile.d/z10_spack_environment.sh
+
+# replace faulty log.py from fenics ufl
+COPY log.py /opt/
+RUN cd /opt/spack-environment && spack env activate .; \
+    SPACK_HASH_PATH=`spack location --install-dir py-fenics-ufl`; echo $SPACK_HASH_PATH; \
+    cp /opt/log.py $SPACK_HASH_PATH/lib/python3.8/site-packages/ufl/;
+
+# Bare OS image to run the installed executables
+FROM spack/ubuntu-bionic
+
+COPY --from=builder /opt/spack-environment /opt/spack-environment
+COPY --from=builder /opt/software /opt/software
+COPY --from=builder /opt/view /opt/view
+COPY --from=builder /etc/profile.d/z10_spack_environment.sh /etc/profile.d/z10_spack_environment.sh
+
+
+
+ENTRYPOINT ["/bin/bash", "--rcfile", "/etc/profile", "-l"]

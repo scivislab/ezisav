@@ -1,0 +1,29 @@
+FROM deivac/dolfin as builder
+
+FROM deivac/paraview as runtime
+SHELL ["/bin/bash","--rcfile", "/etc/profile", "-l", "-c"]
+
+RUN mkdir /home/docker
+RUN chmod 777 /home/docker
+
+COPY --from=builder /opt/spack-environment /opt/spack-environment
+COPY --from=builder /opt/software /opt/software
+COPY --from=builder /opt/view /opt/view
+COPY --from=builder /etc/profile.d/z10_spack_environment.sh /etc/profile.d/z10_spack_environment.sh
+RUN mkdir /home/docker/catalyst
+WORKDIR /home/docker/catalyst
+
+# build examples
+COPY Examples /home/docker/catalyst/Examples
+
+RUN cd /home/docker/catalyst/Examples; \
+    . /opt/spack/share/spack/setup-env.sh ;\
+    mkdir build; cd build; \
+    spack load cmake mpi;  \
+    cmake -DCMAKE_PREFIX_PATH=/opt/software/paraview_build/ -DBUILD_EXAMPLES=ON ..; make;
+COPY start_catalyst.sh /home/docker/catalyst/
+COPY start_dolfin.sh /home/docker/catalyst/
+COPY entrypoint.sh /home/docker/catalyst/
+EXPOSE 11111
+
+ENTRYPOINT ["/home/docker/catalyst/entrypoint.sh"]

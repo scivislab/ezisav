@@ -1,0 +1,15 @@
+# This is a Spack Environment file.
+#
+# It describes a set of packages to be installed, along with
+# configuration settings.
+spack:
+  # add package specs to the `specs` list
+  specs: [cmake, freetype@2.10.2, doxygen@1.8.17, openmpi@4.1.1+legacylaunchers+pmi+singularity+thread_multiple fabrics=ucx schedulers=slurm]
+  view: false
+  container:
+    images:
+      build: deivac/base
+      final: spack/ubuntu-bionic
+
+    strip: false
+
