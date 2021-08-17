@@ -1,4 +1,4 @@
-## DEIVA-C: In Situ Parallel Integrated Containers
+# DEIVA-C: Developing and Evaluating In Situ Visualization Algorithms using Containers
 
 Creating in situ pipelines can be complicated and time-consuming and is therefore often evaded by researchers.
 Due to this, new visualization techniques are often not evaluated sufficiently.
@@ -23,7 +23,7 @@ Additional container layers can be integrated, e.g.to include additional librari
 
 Finally, the top layer uses multi-stage container builds to merge the visualization and the simulation containers into our final, in situ capable, container.
 <figure>
-    <img src="_images/layout.png" title="Layout" alt="Layout" width="400">
+    <img src="_images/layout.svg" title="Layout" alt="Layout" width="100%">
     <figcaption> Overview over the container infrastructure proposed.</figcaption>
 </figure>
 
