@@ -7,5 +7,5 @@ cd ../dolfin
 docker build -t deivac/dolfin -f Dockerfile.dolfin .
 cd ../catalyst
 docker build -t deivac/catalyst -f Dockerfile.catalyst .
-docker run -p 11111:11111 deivac/catalyst
+docker run -it -p 11111:11111 deivac/catalyst
 # connect via Paraview localhost:11111, start the catalyst connection and execute one of the start scripts in the container

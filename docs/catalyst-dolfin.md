@@ -58,9 +58,10 @@ This example is part of the DOLFIN demo suite, adapted to work for Catalyst.
 ## Build instructions
 The Catalyst container depends on the ParaView and on the FEniCS DOLFIN container, which in turn relies on the Base container, as seen in the following figure. Therefore those two containers need to be built beforehand with the correct tags. The commands for this are found in [build-catalyst.sh](https://github.com/scivislab/deiva-c/blob/main/build-catalyst.sh).
 <figure>
-    <img src="_images/dolfin/layout_dolfin.svg" title="Layout" alt="Layout" width="80%">
+    <img src="_images/dolfin/layout_dolfin.svg" title="Layout" alt="Layout" width="100%">
     <figcaption> Overview over the container layout for ParaView Catalyst and FEniCS DOLFIN.</figcaption>
 </figure>
+
 
 ### Customization
 The container is able to run one of two workloads: a simple proof of concept grid in which the simulation consists of the velocity values being updated according to the current timestep and the aforementioned DOLFIN simulation. The ParaView visualization for the data received is controlled via [Catalyst pipeline scripts](https://blog.kitware.com/anatomy-of-a-paraview-catalyst-python-script/) and can be customized by adding or removing [filters](https://www.paraview.org/Wiki/ParaView/Users_Guide/List_of_filters#Slice), to interpret the data.

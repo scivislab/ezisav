@@ -21,9 +21,9 @@ RUN cd /home/docker/catalyst/Examples; \
     mkdir build; cd build; \
     spack load cmake mpi;  \
     cmake -DCMAKE_PREFIX_PATH=/opt/software/paraview_build/ -DBUILD_EXAMPLES=ON ..; make;
-COPY start_catalyst.sh /home/docker/catalyst/
-COPY start_dolfin.sh /home/docker/catalyst/
-COPY entrypoint.sh /home/docker/catalyst/
+COPY start_catalyst.sh /home/docker/catalyst/start_catalyst.sh
+COPY start_dolfin.sh /home/docker/catalyst/start_dolfin.sh
+COPY entrypoint.sh /home/docker/catalyst/entrypoint.sh
 EXPOSE 11111
 
 ENTRYPOINT ["/home/docker/catalyst/entrypoint.sh"]
