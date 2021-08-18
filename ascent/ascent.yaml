@@ -9,7 +9,7 @@ spack:
   view: false
   container:
     images:
-      build: deivac/base
+      build: deivac/base:ascent
       final: spack/ubuntu-bionic:0.16.1
 
     strip: false

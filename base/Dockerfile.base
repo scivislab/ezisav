@@ -26,7 +26,8 @@ RUN cd /opt/spack-environment && \
 
 
 # Bare OS image to run the installed executables
-FROM spack/ubuntu-bionic
+ARG TAG=latest
+FROM spack/ubuntu-bionic:$TAG
 
 COPY --from=builder /opt/spack-environment /opt/spack-environment
 COPY --from=builder /opt/software /opt/software
