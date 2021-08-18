@@ -1,3 +1,4 @@
+ARG SPACK_VERSION=latest
 # Build stage with Spack pre-installed and ready to be used
 FROM spack/ubuntu-bionic as builder
 
@@ -26,8 +27,7 @@ RUN cd /opt/spack-environment && \
 
 
 # Bare OS image to run the installed executables
-ARG TAG=latest
-FROM spack/ubuntu-bionic:$TAG
+FROM spack/ubuntu-bionic:${SPACK_VERSION}
 
 COPY --from=builder /opt/spack-environment /opt/spack-environment
 COPY --from=builder /opt/software /opt/software
