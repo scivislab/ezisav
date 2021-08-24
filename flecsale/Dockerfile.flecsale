@@ -1,0 +1,59 @@
+# Build stage with Spack pre-installed and ready to be used
+FROM deivac/base as builder
+
+#RUN apt-get update && apt-get install -y less tcl-dev; \
+#    cd /opt/software/; curl -LJO https://github.com/cea-hpc/modules/releases/download/v4.8.0/modules-4.8.0.tar.gz;\
+#    tar xfz modules-4.8.0.tar.gz; cd modules-4.8.0; ./configure --bindir=/bin/ ; make; make install; module avail;
+# What we want to install and how we want to install it
+# is specified in a manifest file (spack.yaml)
+RUN git clone https://github.com/laristra/ristra_spackages.git; spack repo add --scope site ristra_spackages/spack-repo;
+RUN (echo "spack:" \
+&&   echo "  specs:" \
+&&   echo "  - flecsalemm-deps backend=mpi" \
+#&&   echo "  - cmake" \
+&&   echo "  - cereal" \
+#&&   echo "  - flecsi" \
+#&&   echo "  - netcdf-c" \
+#&&   echo "  - netcdf-fortran" \
+#&&   echo "  - boost+mpi" \
+#&&   echo "  - exodusii+mpi" \
+&&   echo "  - openmpi@4.1.1+legacylaunchers+pmi+singularity+thread_multiple fabrics=ucx schedulers=slurm" \
+&&   echo "  view: false" \
+&&   echo "  concretization: together" \
+&&   echo "  config:" \
+&&   echo "    install_tree: /opt/software") > /opt/spack-environment/spack.yaml
+
+# Install the software, remove unnecessary deps
+RUN  cd /opt/spack-environment && spack env activate . && export SPACKMON_USER=$(cat /run/secrets/su) && export SPACKMON_TOKEN=$(cat /run/secrets/st) && spack install --fail-fast
+
+# Modifications to the environment that are necessary to run
+RUN cd /opt/spack-environment && \
+    spack env activate --sh -d . >> /etc/profile.d/z10_spack_environment.sh
+
+COPY flecsale /opt/software/flecsale
+
+RUN cd /opt/spack-environment && spack env activate .; \
+    source /etc/profile.d/lmod.sh; \
+    . /opt/spack/share/spack/setup-env.sh; \
+    cd /opt/software; \ 
+    spack module tcl refresh -y; spack env loads -r; \
+    . /opt/spack-environment/loads; \
+    #spack load cmake mpi boost exodusii cereal netcdf-c netcdf-fortran; \
+    mkdir flecsale_build; cd flecsale_build; \
+    CC=mpicc CXX=mpic++ cmake \
+    #-DParaView_DIR=/home/docker/paraview_build/ \
+    #-DVTK_DIR=/home/docker/paraview_build/VTK/ \
+    #-DUSE_CATALYST=ON \
+    ../flecsale/; make -j 1;
+
+# Bare OS image to run the installed executables
+FROM spack/ubuntu-bionic
+
+COPY --from=builder /opt/spack-environment /opt/spack-environment
+COPY --from=builder /opt/software /opt/software
+COPY --from=builder /opt/view /opt/view
+COPY --from=builder /etc/profile.d/z10_spack_environment.sh /etc/profile.d/z10_spack_environment.sh
+
+
+
+ENTRYPOINT ["/bin/bash", "--rcfile", "/etc/profile", "-l"]

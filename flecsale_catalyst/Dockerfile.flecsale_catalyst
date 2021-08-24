@@ -1,0 +1,18 @@
+FROM deivac/flecsale as builder
+
+FROM deivac/paraview as runtime
+SHELL ["/bin/bash","--rcfile", "/etc/profile", "-l", "-c"]
+
+RUN mkdir /home/docker
+RUN chmod 777 /home/docker
+
+COPY --from=builder /opt/spack-environment /opt/spack-environment
+COPY --from=builder /opt/software /opt/software
+COPY --from=builder /opt/view /opt/view
+COPY --from=builder /etc/profile.d/z10_spack_environment.sh /etc/profile.d/z10_spack_environment.sh
+RUN mkdir /home/docker/catalyst
+WORKDIR /home/docker/catalyst
+
+# build flecsale with catalyst support
+
+ENTRYPOINT ["/home/docker/catalyst/entrypoint.sh"]
