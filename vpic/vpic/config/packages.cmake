@@ -137,7 +137,7 @@ if(USE_CATALYST)
   #--------------------------------------------------
   # Find and Use ParaView
   #--------------------------------------------------
-  FIND_PACKAGE(ParaView REQUIRED COMPONENTS vtkPVPythonCatalyst)
+  FIND_PACKAGE(ParaView 5.8 REQUIRED COMPONENTS PythonCatalyst)
 
   # Add compile definition that we'll be using Catalyst
   add_definitions(-DUSE_CATALYST)
@@ -145,7 +145,7 @@ if(USE_CATALYST)
   # this CMake code is to get the dependent ParaView Catalyst libraries
   # and their locations for creating the vpic and vpic-local scripts
   execute_process(COMMAND "${ParaView_DIR}/bin/paraview-config"
-    --libs vtkPVPythonCatalyst
+    --libs PythonCatalyst
     OUTPUT_VARIABLE CATALYST_INFO
     ERROR_QUIET
     OUTPUT_STRIP_TRAILING_WHITESPACE)

@@ -1,9 +1,11 @@
 # Build stage with Spack pre-installed and ready to be used
 FROM deivac/base as builder
 
-#RUN apt-get update && apt-get install -y less tcl-dev; \
-#    cd /opt/software/; curl -LJO https://github.com/cea-hpc/modules/releases/download/v4.8.0/modules-4.8.0.tar.gz;\
-#    tar xfz modules-4.8.0.tar.gz; cd modules-4.8.0; ./configure --bindir=/bin/ ; make; make install; module avail;
+RUN curl https://www.openssl.org/source/old/1.0.2/openssl-1.0.2u.tar.gz | tar xz; \
+    cd openssl-1.0.2u; ./config ;make; make install; \
+    ln -sf /usr/local/ssl/bin/openssl `which openssl`; openssl version -v;
+
+
 # What we want to install and how we want to install it
 # is specified in a manifest file (spack.yaml)
 RUN git clone https://github.com/laristra/ristra_spackages.git; spack repo add --scope site ristra_spackages/spack-repo;
@@ -24,7 +26,7 @@ RUN (echo "spack:" \
 &&   echo "    install_tree: /opt/software") > /opt/spack-environment/spack.yaml
 
 # Install the software, remove unnecessary deps
-RUN  cd /opt/spack-environment && spack env activate . && export SPACKMON_USER=$(cat /run/secrets/su) && export SPACKMON_TOKEN=$(cat /run/secrets/st) && spack install --fail-fast
+RUN  cd /opt/spack-environment && spack env activate . && export SPACKMON_USER=$(cat /run/secrets/su) && export SPACKMON_TOKEN=$(cat /run/secrets/st) && spack install --deprecated --fail-fast
 
 # Modifications to the environment that are necessary to run
 RUN cd /opt/spack-environment && \
@@ -38,14 +40,20 @@ RUN cd /opt/spack-environment && spack env activate .; \
     cd /opt/software; \ 
     spack module tcl refresh -y; spack env loads -r; \
     . /opt/spack-environment/loads; \
-    #spack load cmake mpi boost exodusii cereal netcdf-c netcdf-fortran; \
     mkdir flecsale_build; cd flecsale_build; \
-    CC=mpicc CXX=mpic++ cmake \
+    SPACK_NETCDF_PATH=`spack find -p netcdf-c`; \
+    SPACK_HASH_PATH=`echo $SPACK_NETCDF_PATH | awk '{print $NF}'`;\
+    SPACK_OPENSSL_PATH=`spack find -p openssl`; \
+    SPACK_SSL_HASH_PATH=`echo $SPACK_OPENSSL_PATH | awk '{print $NF}'`;\
+    rm -rf $SPACK_SSL_HASH_PATH; \
+    CC=mpicc CXX=mpic++ CXXFLAGS=-I\ $SPACK_HASH_PATH/include \
+    cmake \
+    -DOpenSSL_ROOT=/usr/local/ssl \
     #-DParaView_DIR=/home/docker/paraview_build/ \
     #-DVTK_DIR=/home/docker/paraview_build/VTK/ \
     #-DUSE_CATALYST=ON \
-    ../flecsale/; make -j 1;
-
+    ../flecsale/; make -j;
+    
 # Bare OS image to run the installed executables
 FROM spack/ubuntu-bionic
 

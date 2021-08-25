@@ -28,10 +28,8 @@ RUN cd /opt/spack-environment && spack env activate .; \
     spack load cmake mpi; \
     mkdir vpic.bin; cd vpic.bin; \
     cmake \ 
-    #-DUSE_CATALYST=ON \
-    #-DParaView_DIR=/home/docker/paraview_build/ \
     -DCMAKE_INSTALL_PREFIX=/home/docker/vpic.bin/ \
-    ../vpic; make -j 1;
+    ../vpic; make -j;
 
 # Bare OS image to run the installed executables
 FROM spack/ubuntu-bionic

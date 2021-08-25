@@ -29,6 +29,7 @@ cmake_minimum_required(VERSION 2.8)
 # Include project-level CMake configuration file
 #------------------------------------------------------------------------------#
 
+cmake_policy(SET CMP0074 NEW)
 option(USE_CATALYST "Link the sim with Catalyst for in situ" OFF)
 
 if (USE_CATALYST)

@@ -1,6 +1,6 @@
 FROM deivac/flecsale as builder
 
-FROM deivac/paraview as runtime
+FROM deivac/paraview:5.6 as runtime
 SHELL ["/bin/bash","--rcfile", "/etc/profile", "-l", "-c"]
 
 RUN mkdir /home/docker
@@ -10,9 +10,33 @@ COPY --from=builder /opt/spack-environment /opt/spack-environment
 COPY --from=builder /opt/software /opt/software
 COPY --from=builder /opt/view /opt/view
 COPY --from=builder /etc/profile.d/z10_spack_environment.sh /etc/profile.d/z10_spack_environment.sh
-RUN mkdir /home/docker/catalyst
-WORKDIR /home/docker/catalyst
 
+RUN curl https://www.openssl.org/source/old/1.0.2/openssl-1.0.2u.tar.gz | tar xz; \
+    cd openssl-1.0.2u; ./config ;make; make install; \
+    ln -sf /usr/local/ssl/bin/openssl `which openssl`; openssl version -v;
+RUN git clone https://github.com/laristra/ristra_spackages.git; spack repo add --scope site ristra_spackages/spack-repo;
 # build flecsale with catalyst support
+RUN source /etc/profile.d/lmod.sh; \
+    . /opt/spack/share/spack/setup-env.sh; \
+    cd /opt/software; \ 
+    spack module tcl refresh -y; spack env loads -r; \
+    . /opt/spack-environment/loads; \
+    cd flecsale_build; \
+    SPACK_NETCDF_PATH=`spack find -p netcdf-c`; \
+    SPACK_HASH_PATH=`echo $SPACK_NETCDF_PATH | awk '{print $NF}'`;\
+    SPACK_OPENSSL_PATH=`spack find -p openssl`; \
+    SPACK_SSL_HASH_PATH=`echo $SPACK_OPENSSL_PATH | awk '{print $NF}'`;\
+    rm -rf $SPACK_SSL_HASH_PATH; \
+    CC=mpicc CXX=mpic++ CXXFLAGS=-I\ $SPACK_HASH_PATH/include \
+    cmake \
+    -DOpenSSL_ROOT=/usr/local/ssl \
+    -DParaView_DIR=/opt/software/paraview_build/ \
+    -DVTK_DIR=/opt/software/paraview_build/VTK/ \
+    -DUSE_CATALYST=ON \
+    ../flecsale/; 
 
-ENTRYPOINT ["/home/docker/catalyst/entrypoint.sh"]
+# Copy launcher scripts
+
+
+
+ENTRYPOINT ["/home/docker/entrypoint.sh"]

@@ -28,6 +28,7 @@ cmake_minimum_required(VERSION 2.8)
 #------------------------------------------------------------------------------#
 # Include project-level CMake configuration file
 #------------------------------------------------------------------------------#
+cmake_policy(SET CMP0074 NEW)
 
 if(NOT "$ENV{CINCH_SOURCE_DIR}" STREQUAL "")
     set(CINCH_SOURCE_DIR $ENV{CINCH_SOURCE_DIR})

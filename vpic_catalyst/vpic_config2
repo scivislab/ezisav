@@ -1,0 +1,10 @@
+# Folder Name
+threshold
+# Deck
+/home/docker/vpic/sample/turbulence_master.cxx
+# Files
+/home/docker/vpic/sample/benchmark.py
+/home/docker/vpic/sample/parse_timings.py
+# Scripts
+/home/docker/vpic/sample/threshold.py
+# End

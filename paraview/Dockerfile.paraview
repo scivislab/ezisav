@@ -1,3 +1,4 @@
+ARG PV_VERSION=5.8.0
 # Build stage with Spack pre-installed and ready to be used
 FROM deivac/base as builder
 
@@ -19,21 +20,35 @@ RUN (echo "spack:" \
 RUN  cd /opt/spack-environment && spack env activate . && export SPACKMON_USER=$(cat /run/secrets/su) && export SPACKMON_TOKEN=$(cat /run/secrets/st) && spack install --fail-fast 
 
 #install the paraview dependencies
-RUN cd /opt/spack-environment && spack env activate . && export SPACKMON_USER=$(cat /run/secrets/su) && export SPACKMON_TOKEN=$(cat /run/secrets/st) && spack add paraview@5.8.0+python3+mpi+osmesa && spack install --fail-fast --only dependencies
-RUN cd /opt/software; git clone --recursive https://gitlab.kitware.com/paraview/paraview.git; cd paraview/; git checkout v5.8.0; git submodule update --init --recursive; 
+RUN cd /opt/spack-environment && spack env activate . && export SPACKMON_USER=$(cat /run/secrets/su) && export SPACKMON_TOKEN=$(cat /run/secrets/st) && spack add paraview@${PV_VERSION}+python3+mpi+osmesa && spack install --fail-fast --only dependencies
+RUN cd /opt/software; git clone --recursive https://gitlab.kitware.com/paraview/paraview.git; cd paraview/; git checkout v${PV_VERSION}; git submodule update --init --recursive; 
 
 RUN cd /opt/spack-environment && spack env activate .; \
     . /opt/spack/share/spack/setup-env.sh; \
     cd /opt/software; \ 
     mkdir paraview_build; cd paraview_build; \
     spack load cmake ninja mpi mesa; \
-    cmake -G Ninja -DPARAVIEW_USE_VTKM=OFF \
-    -DPARAVIEW_USE_QT=OFF \
-    -DPARAVIEW_USE_PYTHON=ON \
-    -DPARAVIEW_USE_MPI=ON \
-    -DVTK_USE_X=OFF \
-    -DVTK_OPENGL_HAS_OSMESA=ON \
-    -DPARAVIEW_BUILD_EDITION=CATALYST_RENDERING ../paraview; cmake --build .; cmake --install .;
+    if ["$PV_VERSION" = "v5.8.0"]; \
+    then \
+        cmake -G Ninja -DPARAVIEW_USE_VTKM=OFF \
+        -DPARAVIEW_USE_QT=OFF \
+        -DPARAVIEW_USE_PYTHON=ON \
+        -DPARAVIEW_USE_MPI=ON \
+        -DVTK_USE_X=OFF \
+        -DVTK_OPENGL_HAS_OSMESA=ON \
+        -DPARAVIEW_BUILD_EDITION=CATALYST_RENDERING ../paraview; cmake --build .; cmake --install .;\
+    else \
+        cmake \
+        -DBUILD_TESTING=OFF \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DPARAVIEW_ENABLE_CATALYST=ON  \
+        -DPARAVIEW_ENABLE_PYTHON=ON \
+        -DPARAVIEW_BUILD_QT_GUI=OFF \
+        -DVTK_USE_X=OFF \
+        -DVTK_OPENGL_HAS_OSMESA=ON \
+        -DPARAVIEW_USE_MPI=ON \
+        ../paraview; make -j 8; make install;\
+    fi
 
 RUN cd /opt/spack-environment && spack env activate .  && spack gc -y
 
