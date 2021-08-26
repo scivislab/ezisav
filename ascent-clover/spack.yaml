@@ -1,0 +1,46 @@
+# This is a Spack Environment file.
+#
+# It describes a set of packages to be installed, along with
+# configuration settings.
+spack:
+  # add package specs to the `specs` list
+  packages:
+    all:
+      target: [haswell]
+      providers:
+        mpi: [openmpi]
+    boost:
+      version: ['1.74.0'] # compatibility with older kernels (https://github.com/boostorg/filesystem/issues/173)
+    llvm:
+      variants: '~compiler-rt~clang~gold~libcxx~lld~lldb~internal_unwind'
+    openmpi:
+      variants: '@4.1.1 +legacylaunchers+pmi+thread_multiple fabrics=ucx schedulers=slurm'
+    mesa:
+      variants: '~glx'
+    ascent: 
+      variants: '+mpi+vtk-h+fortran+test+python+serial ~openmp~adios~mfem'
+    conduit:
+      variants: '~test'
+    vtk-m: 
+      variants: '~openmp'
+    vtk-h:
+      variants: '+mpi'
+  specs:
+  - ascent
+  - cloverleaf3d
+  concretization: together
+  container:
+    images:
+      os: 'ubuntu:18.04'
+      spack: latest
+    strip: true
+    os_packages:
+      final:
+      - vim
+      - less
+      - libgfortran4
+    extra_instructions:
+      build: |
+        # make sure that the cloverleaf binary with ascent support is accessible in PATH
+        RUN spack env activate -d /opt/spack-environment \
+         && ln -s $(spack location -i ascent)/examples/ascent/proxies/cloverleaf3d/cloverleaf3d_par /opt/view/bin
