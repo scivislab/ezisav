@@ -1,6 +1,6 @@
-FROM deivac/dolfin as builder
+FROM ezisav/dolfin as builder
 
-FROM deivac/paraview as runtime
+FROM ezisav/paraview as runtime
 SHELL ["/bin/bash","--rcfile", "/etc/profile", "-l", "-c"]
 
 RUN mkdir /home/docker

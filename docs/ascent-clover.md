@@ -35,17 +35,17 @@
 </table>
 
 ## Build instructions
-The CloverLeaf3D container depends on the Ascent container, which in turn relies on the Base container, as seen in the following figure. Therefore those two containers need to be built beforehand with the correct tags. The commands for this are found in [build-clover.sh](https://github.com/scivislab/deiva-c/blob/main/build-clover.sh).
+The CloverLeaf3D container depends on the Ascent container, which in turn relies on the Base container, as seen in the following figure. Therefore those two containers need to be built beforehand with the correct tags. The commands for this are found in [build-clover.sh](https://github.com/scivislab/ezisav/blob/main/build-clover.sh).
 <figure>
     <img src="_images/clover/layout_clover.svg" title="Layout" alt="Layout" width="80%">
     <figcaption> Overview over the container layout for Ascent and CloverLeaf3D.</figcaption>
 </figure>
 
 ### Customization
-The Ascent actions, and therefore the visualization for the resulting data, can be changed by editing [ascent_actions.yaml](https://github.com/scivislab/deiva-c/blob/main/clover/inputs/ascent/ascent_actions.yaml). More information on Ascent actions can be found [here](https://ascent.readthedocs.io/en/latest/Actions/index.html). When finished with the customization, the container can be rebuilt by navigating into the `clover` directory and executing:
+The Ascent actions, and therefore the visualization for the resulting data, can be changed by editing [ascent_actions.yaml](https://github.com/scivislab/ezisav/blob/main/clover/inputs/ascent/ascent_actions.yaml). More information on Ascent actions can be found [here](https://ascent.readthedocs.io/en/latest/Actions/index.html). When finished with the customization, the container can be rebuilt by navigating into the `clover` directory and executing:
 
 ```bash
-docker build -t deivac/clover -f Dockerfile.clover .
+docker build -t ezisav/clover -f Dockerfile.clover .
 ```
 
 The CloverLeaf3D simulation is being run during container creation and provides a Cinema database.
@@ -54,7 +54,7 @@ The CloverLeaf3D simulation is being run during container creation and provides 
 After either pulling or building the container, it can be run by calling:
 
 ```bash
-docker run -p 80:80 deivac/clover
+docker run -p 80:80 ezisav/clover
 ```
 
 `-p 80:80` makes port 80 available on the outside which is needed for the Cinema viewer. We can then connect to it by visiting `localhost:80` in our browser.
