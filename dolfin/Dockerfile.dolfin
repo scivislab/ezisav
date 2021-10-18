@@ -1,5 +1,5 @@
 # Build stage with Spack pre-installed and ready to be used
-FROM deivac/base as builder
+FROM ezisav/base as builder
 
 
 # What we want to install and how we want to install it

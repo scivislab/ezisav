@@ -1,13 +1,16 @@
-ARG PV_VERSION=5.8.0
-# Build stage with Spack pre-installed and ready to be used
-FROM deivac/base as builder
 
+# Build stage with Spack pre-installed and ready to be used
+FROM ezisav/base as builder
+ARG PV_VERSION=5.8.0
 
 # What we want to install and how we want to install it
 # is specified in a manifest file (spack.yaml)
 RUN (echo "spack:" \
 &&   echo "  specs:" \
 &&   echo "  - cmake" \
+&&   echo "  - python@3.6.14" \
+&&   echo "  - py-numpy@1.19.5" \
+&&   echo "  - py-matplotlib@3.3.4" \
 &&   echo "  - freetype@2.10.2" \
 &&   echo "  - doxygen@1.8.17" \
 &&   echo "  - openmpi@4.1.1+legacylaunchers+pmi+singularity+thread_multiple fabrics=ucx schedulers=slurm" \
@@ -28,8 +31,9 @@ RUN cd /opt/spack-environment && spack env activate .; \
     cd /opt/software; \ 
     mkdir paraview_build; cd paraview_build; \
     spack load cmake ninja mpi mesa; \
-    if ["$PV_VERSION" = "v5.8.0"]; \
+    if [ "$PV_VERSION" == "5.8.0" ]; \
     then \
+        CC=mpicc CXX=mpic++ \
         cmake -G Ninja -DPARAVIEW_USE_VTKM=OFF \
         -DPARAVIEW_USE_QT=OFF \
         -DPARAVIEW_USE_PYTHON=ON \
@@ -38,6 +42,7 @@ RUN cd /opt/spack-environment && spack env activate .; \
         -DVTK_OPENGL_HAS_OSMESA=ON \
         -DPARAVIEW_BUILD_EDITION=CATALYST_RENDERING ../paraview; cmake --build .; cmake --install .;\
     else \
+        CC=gcc CXX=g++ \
         cmake \
         -DBUILD_TESTING=OFF \
         -DCMAKE_BUILD_TYPE=Release \
@@ -47,7 +52,7 @@ RUN cd /opt/spack-environment && spack env activate .; \
         -DVTK_USE_X=OFF \
         -DVTK_OPENGL_HAS_OSMESA=ON \
         -DPARAVIEW_USE_MPI=ON \
-        ../paraview; make -j 8; make install;\
+        ../paraview; make -j; make install;\
     fi
 
 RUN cd /opt/spack-environment && spack env activate .  && spack gc -y

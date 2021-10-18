@@ -8,7 +8,7 @@ spack:
   view: false
   container:
     images:
-      build: deivac/base
+      build: ezisav/base
       final: spack/ubuntu-bionic
 
     strip: false

@@ -1,6 +1,6 @@
-FROM deivac/vpic as builder
+FROM ezisav/vpic as builder
 
-FROM deivac/paraview:5.6 as runtime
+FROM ezisav/paraview:5.6 as runtime
 SHELL ["/bin/bash","--rcfile", "/etc/profile", "-l", "-c"]
 
 RUN mkdir /home/docker

@@ -1,8 +1,8 @@
-# DEIVA-C: Developing and Evaluating In Situ Visualization Algorithms using Containers
+# EZISAV: Developing and Evaluating In Situ Visualization Algorithms using Containers
 
 Creating in situ pipelines can be complicated and time-consuming and is therefore often evaded by researchers.
 Due to this, new visualization techniques are often not evaluated sufficiently.
-We present DEIVA-C, a collection of layered Docker containers encapsulating several pipelines for multiple in situ frameworks in a ready to use package, which are thus quickly operational.
+We present EZISAV, a collection of layered Docker containers encapsulating several pipelines for multiple in situ frameworks in a ready to use package, which are thus quickly operational.
 Designed for portability and ease of use, these containers provide proof of concept examples.
 
 Our containers are available from a container registry, but we also provide the container recipes used to build them and guidance on how to apply customization.
@@ -36,14 +36,14 @@ Several different infrastructures for in situ visualization exist, each with the
 However, integrating these infrastructures into existing simulations, either via existing in situ adaptors or by creating one yourself, can be tiresome and requires a deep investment into a multitude of libraries and dependencies.
 Thus, new visualization techniques may not receive the proper validation and evaluation.
 
-We present DEIVA-C, a set of workflows which aims to alleviate this problem. 
+We present EZISAV, a set of workflows which aims to alleviate this problem. 
 It consists of multiple containers building two different in situ frameworks, showcasing examples for them.
 We provide these workflows as an open repository with instructions on how to work with them.
 The images themselves are publicly available via Docker Hub, but even more importantly, we also provide the Dockerfiles and all files used for building these images.
 Included with the image files are instructions on how to modify (e.g. to change the ParaView pipeline) and how to rebuild the container.
 This allows for quicker prototyping and can even be used in HPC environments to make use of large-scale parallelism, which is supported in many simulation codes.
 
-Using the DEIVA-C examples, the time spent on setting up lengthy workflows and integrating in situ visualization into simulations can instead be used for additional validation and evaluation. 
+Using the EZISAV examples, the time spent on setting up lengthy workflows and integrating in situ visualization into simulations can instead be used for additional validation and evaluation. 
 Nevertheless, there are still improvements which can make the repository more useful to scientists.
 The most prominent way which we can improve our collection of workflows is by simply expanding it. 
 While we provide an open repository presenting multiple different use-cases, this collection is certainly not a complete one.

@@ -1,7 +1,7 @@
-# DEIVA-C
+# EZISAV
 
 > In Situ Parallel Integrated Containers
 
-[GitHub](https://github.com/m-s-will/DEIVA-C/)
-[Find out more](#DEIVA-C)
+[GitHub](https://github.com/m-s-will/EZISAV/)
+[Find out more](#EZISAV)
 
